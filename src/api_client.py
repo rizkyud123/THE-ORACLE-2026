@@ -370,25 +370,28 @@ class FootballAPIClient:
     
    def _fetch_competition(self, comp_id: int, date: str) -> List[Dict]:
     try:
-        # Tambahkan 2 hari ke depan agar Matchday weekend terbaca
-        date_to = (datetime.strptime(date, '%Y-%m-%d') + timedelta(days=2)).strftime('%Y-%m-%d')
+        # S.Kom Fix: Tambahkan rentang 3 hari (Kemarin, Hari Ini, Besok)
+        # Ini krusial agar tidak ada pertandingan yang terlewat karena beda timezone
+        current_dt = datetime.strptime(date, '%Y-%m-%d')
+        d_from = (current_dt - timedelta(days=1)).strftime('%Y-%m-%d')
+        d_to = (current_dt + timedelta(days=2)).strftime('%Y-%m-%d')
         
         response = requests.get(
             f"{self.base_url}/competitions/{comp_id}/matches",
             headers=self.headers,
-            params={'dateFrom': date, 'dateTo': date_to}, # PAKAI RANGE!
+            params={'dateFrom': d_from, 'dateTo': d_to}, # PAKAI RANGE 3 HARI
             timeout=10
         )
-            
-            if response.status_code == 403:
-                return []
-            
-            response.raise_for_status()
-            data = response.json()
-            return data.get('matches', [])
-            
-        except Exception as e:
+        
+        if response.status_code == 403:
             return []
+        
+        response.raise_for_status()
+        data = response.json()
+        return data.get('matches', [])
+    except Exception as e:
+        logger.debug(f"Fetch error for {comp_id}: {e}")
+        return []
     
     def get_matches(self, date: str) -> List[Dict]:
         return self.check_all_leagues(date)
@@ -605,5 +608,6 @@ def test_all_leagues():
 
 if __name__ == "__main__":
     test_all_leagues()
+
 
 
