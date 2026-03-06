@@ -1,0 +1,112 @@
+{
+  "project_name": "The Oracle 2026: Soccer Intelligence System",
+  "developer": "Rizki Wahyudi, S.Kom",
+  "version": "2.0.0",
+  "architecture": {
+    "engine": "Hybrid AI Consensus",
+    "methodology": "Triangulasi Data (Stats, Sentiment, Market)",
+    "platform": ["Telegram Bot", "Streamlit Dashboard", "Python Backend"]
+  },
+  "api_keys": {
+    "api_football": "",
+    "openweathermap": "",
+    "telegram_bot_token": "",
+    "telegram_chat_id": "7427578533",
+    "newsapi": "",
+    "the_odds_api": "",
+    "rapidapi_key": "",
+    "rapidapi_host_livescore": "livescore6.p.rapidapi.com",
+    "rapidapi_host_sport": "sportapi6.p.rapidapi.com"
+  },
+  "core_pillars": {
+    "pillar_1_statistical": {
+      "features": [
+        "Poisson Distribution Score Prediction",
+        "Expected Goals (xG) Analysis",
+        "Head-to-Head (H2H) Historical Dominance",
+        "Macro League Standings & Form Factor",
+        "Home/Away Advantage Analytics"
+      ]
+    },
+    "pillar_2_human_context": {
+      "features": [
+        "NLP News Sentiment Scraper",
+        "Line-up Analysis",
+        "Tactical Manager Matchup",
+        "Motivation & Stakes Engine",
+        "Fatigue & Travel Distance Index"
+      ]
+    },
+    "pillar_3_market_intelligence": {
+      "features": [
+        "Anti-Trap: Dropping Odds Detector",
+        "Smart Money Flow Analysis",
+        "Market Sentiment Bias vs Statistics",
+        "Referee Disciplinary Profiling",
+        "Weather & Pitch Intelligence"
+      ]
+    }
+  },
+  "triangulation_logic": {
+    "rules": [
+      {
+        "condition": "Statistik Mendukung AND Sentimen Positif AND Pasar Stabil",
+        "result": "HIGH CONFIDENCE",
+        "icon": "🔥",
+        "description": "JACKPOT POTENTIAL"
+      },
+      {
+        "condition": "Statistik Mendukung BUT Pasar Anomali (Odds naik mencurigakan)",
+        "result": "SKIP",
+        "icon": "🚫",
+        "description": "POTENTIAL TRAP"
+      },
+      {
+        "condition": "Statistik Mendukung BUT Sentimen Negatif (Cedera Mendadak)",
+        "result": "MEDIUM RISK",
+        "icon": "⚠️",
+        "description": "CAUTION"
+      }
+    ]
+  },
+  "automation_features": {
+    "daily_operation": {
+      "type": "Auto-Proactive",
+      "output": "Daily Top 10 Picks",
+      "threshold": 85,
+      "schedule": "07:00"
+    },
+    "execution_strategy": {
+      "optimal_entry_timer_prematch": 60,
+      "optimal_entry_timer_live": 15,
+      "kelly_criterion_fraction": 0.25
+    }
+  },
+  "prediction_settings": {
+    "min_confidence_threshold": 70,
+    "high_confidence_threshold": 85,
+    "leagues": [
+      "Premier League",
+      "La Liga",
+      "Serie A",
+      "Bundesliga",
+      "Ligue 1",
+      "Champions League",
+      "Europa League"
+    ]
+  },
+  "deployment_requirements": {
+    "language": "Python 3.10+",
+    "api_dependencies": ["API-Football", "OpenWeatherMap API", "NewsAPI", "RapidAPI Livescore", "The Odds API"],
+    "libraries": [
+      "numpy",
+      "scipy",
+      "pandas",
+      "requests",
+      "beautifulsoup4",
+      "python-telegram-bot",
+      "streamlit",
+      "apscheduler"
+    ]
+  }
+}

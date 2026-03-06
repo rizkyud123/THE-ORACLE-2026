@@ -1,0 +1,29 @@
+livescore
+App = default-application_11629088
+X-RapidAPI-Key = 4666a7fa0cmsh945954136dfc854p137b5djsn5927d5725e3f
+Request URL = rapidapi.com
+
+SportAPI
+App=default-application_11629088
+X-RapidAPI-Key= 4666a7fa0cmsh945954136dfc854p137b5djsn5927d5725e3f
+Request URL = rapidapi.com
+
+the odds APi
+API key = a1cfd1f640a66c683e9df03209a8e286
+
+openweather 
+Default Key= dfb58ff634e9ea04ec1730e18fbd4365  
+Cuaca = 9dcc126e579fe26b1eb30338a1e02017
+
+football-data.org
+Token API Anda: 1f9bdaa5ab814f6f813c78c396b37ae9
+
+newsapi.org
+Your API key is: c5742c83016148e3a7742935e09b45e6
+
+telegram 
+Api = 8742924317:AAHvgXgjDYtCQTKEJiToJJhSasfb1Rm8QdQ
+@rzkiidd
+Id: 7427578533
+First: Rizki Wahyudi
+Lang: en
