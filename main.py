@@ -110,19 +110,22 @@ def fetch_all_global_matches(date: str = None) -> tuple:
         pass
     
     # Fallback to Football-Data.org
-    logger.info("🔄 Trying Football-Data.org (ALL LEAGUES)...")
-    
-    for comp in ALL_COMPETITIONS:
-        try:
-            matches = api_client.fetch_matches_by_competition(comp['id'], date)
-            if matches:
-                matches_by_competition[comp['name']] = len(matches)
-                all_matches.extend(matches)
-                logger.info(f"   ✓ {comp['name']}: {len(matches)} matches")
-        except Exception as e:
-            logger.debug(f"   ✗ {comp['name']}: {e}")
-    
-    logger.info(f"✅ Total matches found: {len(all_matches)}")
+   logger.info(f"📊 Total raw matches before filtering: {len(all_matches)}")
+
+# Filter Prime Time matches
+prime_time_matches = []
+for match in all_matches:
+    kickoff = match.get('kickoff_wita')
+    if kickoff:
+        # Jika kickoff adalah string, convert ke datetime dulu (S.Kom Safety)
+        if isinstance(kickoff, str):
+            kickoff = datetime.fromisoformat(kickoff.replace('Z', '+00:00')).astimezone(WITA)
+            
+        if start_window <= kickoff <= end_window:
+            prime_time_matches.append(match)
+        else:
+            # Opsional: Log pertandingan yang diluar jam agar Mas tahu datanya ada
+            logger.debug(f"⏭️ Skipping {match.get('home_team')} (Kickoff: {kickoff.strftime('%H:%M')} WITA)")
     
     # Filter Prime Time matches
     prime_time_matches = []
@@ -461,3 +464,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
