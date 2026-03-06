@@ -85,19 +85,14 @@ def rate_limit():
 ALL_COMPETITIONS = [
     {'id': 2021, 'name': 'Premier League', 'country': 'England'},
     {'id': 2016, 'name': 'Championship', 'country': 'England'},
-    {'id': 2019, 'name': 'League One', 'country': 'England'},
-    {'id': 2018, 'name': 'League Two', 'country': 'England'},
     {'id': 2002, 'name': 'Bundesliga', 'country': 'Germany'},
     {'id': 2014, 'name': 'Serie A', 'country': 'Italy'},
-    {'id': 2152, 'name': 'Serie B', 'country': 'Italy'},
     {'id': 2015, 'name': 'Ligue 1', 'country': 'France'},
-    {'id': 2017, 'name': 'Ligue 2', 'country': 'France'},
     {'id': 2003, 'name': 'Primera Division', 'country': 'Spain'},
-    {'id': 2004, 'name': 'Segunda Division', 'country': 'Spain'},
-    {'id': 2013, 'name': 'Primeira Liga', 'country': 'Portugal'},
     {'id': 2001, 'name': 'Eredivisie', 'country': 'Netherlands'},
-    {'id': 2005, 'name': 'Belgian Pro League', 'country': 'Belgium'},
-    {'id': 2007, 'name': 'Scottish Premiership', 'country': 'Scotland'},
+    {'id': 2013, 'name': 'Primeira Liga', 'country': 'Portugal'},
+    {'id': 2000, 'name': 'FIFA World Cup', 'country': 'World'},
+    {'id': 2019, 'name': 'Serie A', 'country': 'Brazil'},
 ]
 
 
@@ -373,14 +368,17 @@ class FootballAPIClient:
         
         return all_matches
     
-    def _fetch_competition(self, comp_id: int, date: str) -> List[Dict]:
-        try:
-            response = requests.get(
-                f"{self.base_url}/competitions/{comp_id}/matches",
-                headers=self.headers,
-                params={'dateFrom': date, 'dateTo': date},
-                timeout=10
-            )
+   def _fetch_competition(self, comp_id: int, date: str) -> List[Dict]:
+    try:
+        # Tambahkan 2 hari ke depan agar Matchday weekend terbaca
+        date_to = (datetime.strptime(date, '%Y-%m-%d') + timedelta(days=2)).strftime('%Y-%m-%d')
+        
+        response = requests.get(
+            f"{self.base_url}/competitions/{comp_id}/matches",
+            headers=self.headers,
+            params={'dateFrom': date, 'dateTo': date_to}, # PAKAI RANGE!
+            timeout=10
+        )
             
             if response.status_code == 403:
                 return []
@@ -610,3 +608,4 @@ def test_all_leagues():
 
 if __name__ == "__main__":
     test_all_leagues()
+
