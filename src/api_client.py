@@ -368,29 +368,29 @@ class FootballAPIClient:
         
         return all_matches
     
-   def _fetch_competition(self, comp_id: int, date: str) -> List[Dict]:
+  def _fetch_competition(self, comp_id: int, date: str) -> List[Dict]:
     try:
-        # S.Kom Fix: Tambahkan rentang 3 hari (Kemarin, Hari Ini, Besok)
-        # Ini krusial agar tidak ada pertandingan yang terlewat karena beda timezone
+        # S.Kom Fix: Tambahkan rentang agar Matchday Weekend tertangkap
         current_dt = datetime.strptime(date, '%Y-%m-%d')
-        d_from = (current_dt - timedelta(days=1)).strftime('%Y-%m-%d')
+        # Tarik data dari H-1 sampai H+2 (Total 3 hari)
+        d_from = (current_dt).strftime('%Y-%m-%d')
         d_to = (current_dt + timedelta(days=2)).strftime('%Y-%m-%d')
         
         response = requests.get(
             f"{self.base_url}/competitions/{comp_id}/matches",
             headers=self.headers,
-            params={'dateFrom': d_from, 'dateTo': d_to}, # PAKAI RANGE 3 HARI
+            params={'dateFrom': d_from, 'dateTo': d_to}, # PAKAI RANGE!
             timeout=10
         )
         
         if response.status_code == 403:
-            return []
-        
+            return [] # Liga tidak didukung tier gratis
+            
         response.raise_for_status()
         data = response.json()
         return data.get('matches', [])
     except Exception as e:
-        logger.debug(f"Fetch error for {comp_id}: {e}")
+        logger.debug(f"Fetch error {comp_id}: {e}")
         return []
     
     def get_matches(self, date: str) -> List[Dict]:
@@ -608,6 +608,7 @@ def test_all_leagues():
 
 if __name__ == "__main__":
     test_all_leagues()
+
 
 
 
