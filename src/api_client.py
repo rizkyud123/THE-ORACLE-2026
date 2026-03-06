@@ -457,26 +457,27 @@ class APIClient:
         return enriched
     
     def get_prime_time_matches(self, input_date: str = None) -> tuple:
-        """Get matches within Prime Time window"""
+        """Get matches within Prime Time window with 3-day Smart Lookahead"""
         if not input_date:
             input_date = get_wita_date()
         
         season = get_season_for_date(input_date)
         start_window, end_window = get_prime_time_window(input_date)
         
-        logger.info(f"Prime Time Window: {start_window.strftime('%d %b %Y %H:%M')} - {end_window.strftime('%d %b %Y %H:%M')} WITA")
+        # S.Kom Optimization: Tarik data 3 hari sekaligus untuk cover Weekend WITA
+        current_dt = datetime.strptime(input_date, '%Y-%m-%d')
+        dates_to_fetch = [
+            (current_dt).strftime('%Y-%m-%d'),
+            (current_dt + timedelta(days=1)).strftime('%Y-%m-%d'),
+            (current_dt + timedelta(days=2)).strftime('%Y-%m-%d')
+        ]
+        
+        logger.info(f"📡 Scanning Range: {dates_to_fetch[0]} to {dates_to_fetch[-1]}")
         
         all_matches = []
-        dates_to_fetch = [input_date]
-        
-        try:
-            next_date = (datetime.strptime(input_date, '%Y-%m-%d') + timedelta(days=1)).strftime('%Y-%m-%d')
-            dates_to_fetch.append(next_date)
-        except:
-            pass
-        
-        # Try RapidAPI first
         source_used = None
+
+        # 1. RapidAPI Loop
         try:
             for date in dates_to_fetch:
                 fixtures = self.rapid.get_fixtures(date, season)
@@ -486,41 +487,37 @@ class APIClient:
             
             if all_matches:
                 source_used = "PREMIUM-DB"
-                logger.info(f"✅ Using RapidAPI: {len(all_matches)} matches")
         except Exception as e:
-            logger.warning(f"RapidAPI failed: {e}")
-        
-        # Fallback to Football-Data.org
+            logger.warning(f"⚠️ RapidAPI failed (403/Limit): {e}")
+
+        # 2. Football-Data.org Fallback Loop
         if not all_matches:
-            logger.info("🔄 Trying Football-Data.org (ALL LEAGUES)...")
+            logger.info("🔄 Falling back to Football-Data.org (Multi-Date Scan)...")
             for date in dates_to_fetch:
-                matches = self.football.check_all_leagues(date)
+                matches = self.football.get_matches(date)
                 if matches:
                     parsed = [self._parse_footballdata(m) for m in matches]
                     all_matches.extend([m for m in parsed if m])
             
             if all_matches:
                 source_used = "FALLBACK-DB"
-                logger.info(f"✅ Using Football-Data: {len(all_matches)} matches")
-        
+
         self.last_source = source_used or "NO-DATA"
         
-        # Enrich with odds (real + simulated fallback)
+        # 3. Odds Enrichment & Prime Time Filter
         if all_matches:
-            logger.info("📊 Enriching with odds (Real + Simulated Fallback)...")
+            logger.info(f"📊 Total raw matches found: {len(all_matches)}")
             all_matches = self.enrich_with_odds(all_matches)
             self.last_source += "+ODDS"
         
-        # Filter by Prime Time
         prime_time_matches = []
         for match in all_matches:
             kickoff = match.get('kickoff_wita')
-            if kickoff and is_prime_time(kickoff, start_window, end_window):
+            # Pastikan pengecekan Prime Time mencakup rentang 3 hari tersebut
+            if kickoff and is_prime_time(kickoff, start_window, end_window + timedelta(days=1)):
                 prime_time_matches.append(match)
         
         prime_time_matches.sort(key=lambda x: x.get('kickoff_wita', datetime.min))
-        
-        logger.info(f"Found {len(prime_time_matches)} Prime Time matches [SOURCE: {self.last_source}]")
         return prime_time_matches, self.last_source
     
     def _parse_rapidapi(self, f: Dict) -> Optional[Dict]:
@@ -608,4 +605,5 @@ def test_all_leagues():
 
 if __name__ == "__main__":
     test_all_leagues()
+
 
